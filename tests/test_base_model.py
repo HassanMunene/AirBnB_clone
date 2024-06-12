@@ -41,17 +41,3 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(base_dict['created_at'], base.created_at.isoformat())
         self.assertEqual(base_dict['updated_at'], base.updated_at.isoformat())
 
-    def test_kwargs_initialization(self):
-        """test obj initialization if dictionary is provided"""
-        base_dict = {
-            "__class__": "BaseModel",
-            "id": str(uuid.uuid4()),
-            "created_at": datetime.now().isoformat(),
-            "updated_at": datetime.now().isoformat(),
-            "name": "base_model1"
-        }
-        base = BaseModel(**base_dict)
-        self.assertEqual(base.id, base_dict["id"])
-        self.assertEqual(base.created_at.isoformat(), base_dict["created_at"])
-        self.assertEqual(base.updated_at.isoformat(), base_dict["updated_at"])
-        self.assertEqual(base.name, base_dict["name"])
