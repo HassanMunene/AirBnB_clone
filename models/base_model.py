@@ -25,7 +25,8 @@ class BaseModel:
 
     def __str__(self):
         """return a string representation of the instance"""
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".\
+            format(self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
         """update the updated_at time with the current time"""
