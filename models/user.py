@@ -1,10 +1,16 @@
 #!/usr/bin/python3
-"""Define a blueprint for a user of our Airbnb clone"""
+"""
+Module for User class
+"""
+from models.base_model import BaseModel
 
 
 class User(BaseModel):
-    """The user class"""
+    """
+    Class representing a User
+    """
     email = ""
     password = ""
     first_name = ""
     last_name = ""
+# Hassan Munene
