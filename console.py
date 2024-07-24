@@ -6,12 +6,52 @@ from models.base_model import BaseModel
 from models import storage
 import re
 import json
+from shlex import split
+from models.user import User
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
+
+def parse(arg):
+    curly_braces = re.search(r"\{(.*?)\}", arg)
+    brackets = re.search(r"\[(.*?)\]", arg)
+    if curly_braces is None:
+        if brackets is None:
+            return [i.strip(",") for i in split(arg)]
+        else:
+            lexer = split(arg[:brackets.span()[0]])
+            retl = [i.strip(",") for i in lexer]
+            retl.append(brackets.group())
+            return retl
+    else:
+        lexer = split(arg[:curly_braces.span()[0]])
+        retl = [i.strip(",") for i in lexer]
+        retl.append(curly_braces.group())
+        return retl
 
 
 class HBNBCommand(cmd.Cmd):
     """Class for the command interpreter."""
 
     prompt = "(hbnb) "
+
+    __classes = {
+        "BaseModel",
+        "User",
+        "State",
+        "City",
+        "Place",
+        "Amenity",
+        "Review"
+    }
+
+    def emptyline(self):
+        """Does nothing upon receiving an empty line."""
+        pass
+
+
     def default(self, line):
         """Catch commands if nothing else matches then."""
         # print("DEF:::", line)
@@ -117,24 +157,24 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     print(storage.all()[key])
 
-    def do_destroy(self, line):
-        """Deletes an instance based on the class name and id.
+    def do_destroy(self, arg):
         """
-        if line == "" or line is None:
+        Usage: destroy <class> <id> or <class>.destroy(<id>)
+        Delete a class instance of given id
+        """
+        argl = parse(arg)
+        objdict = storage.all()
+        if len(argl) == 0:
             print("** class name missing **")
+        elif argl[0] not in HBNBCommand.__classes:
+            print("** class doesn't exist **")
+        elif len(argl) == 1:
+            print("** instance id missing **")
+        elif "{}.{}".format(argl[0], argl[1]) not in objdict.keys():
+            print("** no instance found **")
         else:
-            words = line.split(' ')
-            if words[0] not in storage.classes():
-                print("** class doesn't exist **")
-            elif len(words) < 2:
-                print("** instance id missing **")
-            else:
-                key = "{}.{}".format(words[0], words[1])
-                if key not in storage.all():
-                    print("** no instance found **")
-                else:
-                    del storage.all()[key]
-                    storage.save()
+            del objdict["{}.{}".format(argl[0], argl[1])]
+            storage.save()
 
     def do_all(self, line):
         """Prints all string representation of all instances.
